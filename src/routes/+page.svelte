@@ -1,59 +1,41 @@
-<script>
-	import Counter from './Counter.svelte';
-	import welcome from '$lib/images/svelte-welcome.webp';
-	import welcome_fallback from '$lib/images/svelte-welcome.png';
+<script lang="ts">
+  import DarkMode from 'svelte-dark-mode';
+  import { afterUpdate, onMount } from "svelte";
+  import SvgIcon from "$lib/components/general/SvgIcon.svelte";
+
+  $: theme = ''
+
+  afterUpdate(() => {
+    document.body.className = theme
+  });
+
+  $: if (typeof window !== 'undefined')
+    document.body.className = theme;
+
+  $: switchTheme = theme === 'dark' ? 'light' : 'dark'
+
+  onMount(() => loadItem())
+
+  $: text = ''
+
+  async function loadItem() {
+    const res = await fetch('/icons/weather/sun.svg')
+    text = await res.text()
+  }
 </script>
 
-<svelte:head>
-	<title>Home</title>
-	<meta name="description" content="Svelte demo app" />
-</svelte:head>
+<DarkMode bind:theme />
 
-<section>
-	<h1>
-		<span class="welcome">
-			<picture>
-				<source srcset={welcome} type="image/webp" />
-				<img src={welcome_fallback} alt="Welcome" />
-			</picture>
-		</span>
+<h1>This is {theme} mode.</h1>
+<p>Change the theme and reload the page.</p>
+<button on:click={() => (theme = switchTheme)}>
+  Switch to {switchTheme} mode
+</button>
+<SvgIcon icon="weather/sun"></SvgIcon>
+<i>
+  {@html text}
+</i>
 
-		to your new<br />SvelteKit app
-	</h1>
+<style>
 
-	<h2>
-		try editing <strong>src/routes/+page.svelte</strong>
-	</h2>
-
-	<Counter />
-</section>
-
-<style lang="scss">
-	section {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		flex: 0.6;
-
-		h1 {
-			width: 100%;
-		}
-
-		.welcome {
-			display: block;
-			position: relative;
-			width: 100%;
-			height: 0;
-			padding: 0 0 calc(100% * 495 / 2048) 0;
-		}
-
-		.welcome img {
-			position: absolute;
-			width: 100%;
-			height: 100%;
-			top: 0;
-			display: block;
-		}
-	}
 </style>
